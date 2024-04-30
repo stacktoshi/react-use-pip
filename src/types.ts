@@ -82,7 +82,15 @@ interface EnterPictureInPictureEventInit extends EventInit {
   pictureInPictureWindow: PictureInPictureWindow
 }
 
+interface LeavePictureInPictureEventInit extends EventInit {
+  pictureInPictureWindow: PictureInPictureWindow
+}
+
 export interface EnterPictureInPictureEvent extends Event {
+  readonly pictureInPictureWindow: PictureInPictureWindow
+}
+
+export interface LeavePictureInPictureEvent extends Event {
   readonly pictureInPictureWindow: PictureInPictureWindow
 }
 

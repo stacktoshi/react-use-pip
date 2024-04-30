@@ -9,6 +9,7 @@ import {
   usePictureInPictureOptions,
   usePictureInPictureReturnType,
   VideoRefType,
+  EnterPictureInPictureEvent,
 } from './types'
 
 export default function usePictureInPicture(
@@ -57,47 +58,48 @@ export default function usePictureInPicture(
         !isPictureInPictureDisabled(videoRef.current)
     )
 
-    if (
-      onEnterPictureInPicture &&
-      typeof onEnterPictureInPicture === 'function'
-    ) {
-      videoRef.current.addEventListener(
-        'enterpictureinpicture',
-        onEnterPictureInPicture
-      )
+    function _onEnterPictureInPicture(e: EnterPictureInPictureEvent) {
+      if (
+        onEnterPictureInPicture &&
+        typeof onEnterPictureInPicture === 'function'
+      ) {
+        // @ts-ignore
+        onEnterPictureInPicture(e)
+      }
+      togglePictureInPicture(true)
     }
-    if (
-      onLeavePictureInPicture &&
-      typeof onLeavePictureInPicture === 'function'
-    ) {
-      videoRef.current.addEventListener(
-        'leavepictureinpicture',
-        onLeavePictureInPicture
-      )
+    function _onLeavePictureInPicture(e: Event) {
+      if (
+        onLeavePictureInPicture &&
+        typeof onLeavePictureInPicture === 'function'
+      ) {
+        // @ts-ignore
+        onLeavePictureInPicture(e)
+      }
+      togglePictureInPicture(false)
     }
+
+    videoRef.current.addEventListener(
+      'enterpictureinpicture',
+      _onEnterPictureInPicture
+    )
+    videoRef.current.addEventListener(
+      'leavepictureinpicture',
+      _onLeavePictureInPicture
+    )
 
     return () => {
       if (videoRef.current === null) {
         return
       }
-      if (
-        onEnterPictureInPicture &&
-        typeof onEnterPictureInPicture === 'function'
-      ) {
-        videoRef.current.removeEventListener(
-          'enterpictureinpicture',
-          onEnterPictureInPicture
-        )
-      }
-      if (
-        onLeavePictureInPicture &&
-        typeof onLeavePictureInPicture === 'function'
-      ) {
-        videoRef.current.removeEventListener(
-          'leavepictureinpicture',
-          onLeavePictureInPicture
-        )
-      }
+      videoRef.current.removeEventListener(
+        'enterpictureinpicture',
+        _onEnterPictureInPicture
+      )
+      videoRef.current.removeEventListener(
+        'leavepictureinpicture',
+        _onLeavePictureInPicture
+      )
     }
   }, [])
 
@@ -138,9 +140,7 @@ function checkAvailability(video: ExtendedHTMLVideoElement | null) {
     )
   }
   if (video && isWebkitPictureInPictureSupported(video)) {
-    console.warn(
-      'Your browser supports a none-standard Picture in picture API.'
-    )
+    console.warn('Your browser supports a non-standard Picture in picture API.')
   }
 }
 
